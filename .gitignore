@@ -69,3 +69,8 @@ Thumbs.db
 dist/
 frontend/.vite/
 frontend/dist/
+
+# Large ML models (too big for GitHub)
+ml-service/disease_model.h5
+ml-service/yield_model.pkl
+ml-service/yield_encoders.pkl
