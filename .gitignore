@@ -64,3 +64,8 @@ Thumbs.db
 *api_key*
 *secret*
 *password*
+
+# Vite cache
+dist/
+frontend/.vite/
+frontend/dist/
