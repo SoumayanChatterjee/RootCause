@@ -72,6 +72,18 @@ cp backend/.env.example backend/.env
 # Edit backend/.env with your configuration
 ```
 
+6. Train ML Models (Optional - Pre-trained models not included due to size limitations)
+```bash
+# Navigate to ml_service directory
+cd ml_service
+
+# Train the disease detection model
+python train_disease_model.py
+
+# Train the yield prediction model
+python train_yield_model.py
+```
+
 ### Running the Application
 
 1. Start MongoDB
@@ -125,6 +137,19 @@ RootCause/
     ├── models/        # ML models
     └── main.py        # FastAPI application
 ```
+
+## Note on ML Models
+
+Due to GitHub's file size limitations, the pre-trained ML models are not included in this repository:
+- `disease_model.h5` (trained disease detection model)
+- `yield_model.pkl` (trained yield prediction model) 
+- `yield_encoders.pkl` (encoding files for yield prediction)
+
+These models must be trained using the training scripts provided:
+- `train_disease_model.py`
+- `train_yield_model.py`
+
+Or you can download pre-trained models separately if available.
 
 ## License
 
