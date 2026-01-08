@@ -54,7 +54,7 @@ export default function ProfileMenu() {
           localStorage.setItem("userCity", farmer.city);
           localStorage.setItem("userDistrict", farmer.district);
           localStorage.setItem("userVillage", farmer.village);
-          localStorage.setItem("lang", farmer.language || "en");
+          // Removed lang storage as we're no longer persisting language in localStorage
         }
       } catch (error) {
         console.error("Error fetching user details:", error);
@@ -66,7 +66,7 @@ export default function ProfileMenu() {
           city: localStorage.getItem("userCity") || "",
           district: localStorage.getItem("userDistrict") || "",
           village: localStorage.getItem("userVillage") || "",
-          language: localStorage.getItem("lang") || "en"
+          language: "en"  // Default to English as we're not persisting language in localStorage
         });
         setEditData({
           name: localStorage.getItem("userName") || "",
@@ -121,7 +121,7 @@ export default function ProfileMenu() {
       localStorage.setItem("userCity", updatedFarmer.city);
       localStorage.setItem("userDistrict", updatedFarmer.district);
       localStorage.setItem("userVillage", updatedFarmer.village);
-      localStorage.setItem("lang", updatedFarmer.language);
+      // Removed lang storage as we're no longer persisting language in localStorage
       
       // Update language context
       setLang(updatedFarmer.language);
@@ -195,8 +195,11 @@ export default function ProfileMenu() {
               <select 
                 value={lang} 
                 onChange={(e) => {
-                  setLang(e.target.value);
-                  localStorage.setItem("lang", e.target.value);
+                  const selectedLang = e.target.value;
+                  setLang(selectedLang);
+                  
+                  // Dispatch a custom event to notify other parts of the app about language change
+                  window.dispatchEvent(new Event('languageChanged'));
                 }}
                 style={styles.languageSelect}
               >
@@ -205,7 +208,7 @@ export default function ProfileMenu() {
                 ))}
               </select>
             </div>
-            <div style={styles.menuItem} onClick={handleLogout}>
+            <div style={styles.logoutMenuItem} onClick={handleLogout}>
               Logout
             </div>
           </div>
@@ -277,7 +280,17 @@ export default function ProfileMenu() {
             <label>Language:</label>
             <select
               value={editData.language}
-              onChange={(e) => setEditData({...editData, language: e.target.value})}
+              onChange={(e) => {
+                setEditData({...editData, language: e.target.value});
+                
+                // Update language context if this is the active language
+                if (e.target.value !== lang) {
+                  setLang(e.target.value);
+                  
+                  // Dispatch a custom event to notify other parts of the app about language change
+                  window.dispatchEvent(new Event('languageChanged'));
+                }
+              }}
               style={styles.select}
             >
               {languages.map(lang => (
@@ -343,6 +356,20 @@ const styles = {
     padding: '8px',
     cursor: 'pointer',
     borderRadius: '3px'
+  },
+  logoutMenuItem: {
+    padding: '8px',
+    cursor: 'pointer',
+    borderRadius: '3px',
+    backgroundColor: '#ffebee',
+    color: '#c62828',
+    fontWeight: '600',
+    border: '1px solid #ffcdd2',
+    transition: 'all 0.3s ease'
+  },
+  logoutMenuItemHover: {
+    backgroundColor: '#ffcdd2',
+    color: '#b71c1c'
   },
   menuItemHover: {
     backgroundColor: '#f5f5f5'

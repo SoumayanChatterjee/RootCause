@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../../services/api";
 import FarmerLayout from "../../layouts/FarmerLayout";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function DiseaseDetection() {
   const [selectedCrop, setSelectedCrop] = useState("");
@@ -9,10 +10,12 @@ export default function DiseaseDetection() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const { t } = useLanguage();
 
   const crops = [
-    "Rice", "Wheat", "Corn", "Sugarcane", 
-    "Cotton", "Soybean", "Potato", "Tomato"
+    t.rice || "Rice", t.wheat || "Wheat", t.corn || "Corn", t.sugarcane || "Sugarcane", 
+    t.cotton || "Cotton", t.soybean || "Soybean", t.potato || "Potato", t.tomato || "Tomato"
   ];
 
   const handleImageChange = (e) => {
@@ -27,7 +30,7 @@ export default function DiseaseDetection() {
 
   const handleDetect = async () => {
     if (!selectedImage) {
-      setError("Please select an image first");
+      setError(t.pleaseSelectImage || "Please select an image first");
       return;
     }
 
@@ -64,7 +67,7 @@ export default function DiseaseDetection() {
       });
     } catch (err) {
       console.error("Disease detection error:", err);
-      setError(`Error detecting disease: ${err.response?.data?.message || err.message || "Please try again"}`);
+      setError(`${t.errorDetectingDisease || "Error detecting disease"}: ${err.response?.data?.message || err.message || t.pleaseTryAgain || "Please try again"}`);
     } finally {
       setLoading(false);
     }
@@ -81,20 +84,20 @@ export default function DiseaseDetection() {
   };
 
   return (
-    <FarmerLayout title="Disease Detection">
+    <FarmerLayout title={t.diseaseDetection || "Disease Detection"}>
       <div style={styles.container}>
-        <h1 style={styles.heading}>🔬 Crop Disease Detection</h1>
+        <h1 style={styles.heading}>🔬 {t.cropDiseaseDetection || "Crop Disease Detection"}</h1>
         
         <div style={styles.content}>
         <div style={styles.uploadSection}>
           <div style={styles.formGroup}>
-            <label style={styles.resultSubheading}>Select Crop Type:</label>
+            <label style={styles.resultSubheading}>{t.selectCropType || "Select Crop Type:"}</label>
             <select 
               value={selectedCrop} 
               onChange={(e) => setSelectedCrop(e.target.value)}
               style={styles.select}
             >
-              <option value="">-- Select Crop --</option>
+              <option value="">{t.selectCropOption || "-- Select Crop --"}</option>
               {crops.map(crop => (
                 <option key={crop} value={crop}>{crop}</option>
               ))}
@@ -102,7 +105,7 @@ export default function DiseaseDetection() {
           </div>
           
           <div style={styles.formGroup}>
-            <label style={styles.resultSubheading}>Upload Crop Image:</label>
+            <label style={styles.resultSubheading}>{t.uploadCropImage || "Upload Crop Image:"}</label>
             <input
               type="file"
               accept="image/*"
@@ -122,7 +125,7 @@ export default function DiseaseDetection() {
             disabled={loading || !selectedImage}
             style={loading || !selectedImage ? { ...styles.detectButton, ...styles.detectButtonDisabled } : styles.detectButton}
           >
-            {loading ? "Detecting..." : "Detect Disease"}
+            {loading ? `${t.detecting || "Detecting"}...` : t.detectDisease || "Detect Disease"}
           </button>
           
           {error && <div style={styles.error}>{error}</div>}
@@ -130,12 +133,12 @@ export default function DiseaseDetection() {
         
         {result && (
           <div style={styles.resultSection}>
-            <h2 style={styles.resultHeading}>Detection Results</h2>
+            <h2 style={styles.resultHeading}>{t.detectionResults || "Detection Results"}</h2>
             <div style={styles.resultCard}>
-              <h3 style={styles.resultSubheading}>Disease: <span style={styles.diseaseName}>{result.disease}</span></h3>
+              <h3 style={styles.resultSubheading}>{t.diseaseDetected || "Disease:"} <span style={styles.diseaseName}>{result.disease}</span></h3>
               
               <div style={styles.confidenceContainer}>
-                <div style={styles.resultSubheading}>Confidence:</div>
+                <div style={styles.resultSubheading}>{t.confidenceLevel || "Confidence:"}</div>
                 <div style={styles.confidenceBar}>
                   <div style={{
                     ...styles.confidenceFill,
@@ -146,7 +149,7 @@ export default function DiseaseDetection() {
               </div>
               
               <div style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
-                <div style={styles.resultSubheading}>Severity:</div>
+                <div style={styles.resultSubheading}>{t.severityLevel || "Severity:"}</div>
                 <span style={{
                   ...styles.severity,
                   ...(result.severity === "High" ? styles.severityHigh : 
@@ -157,11 +160,11 @@ export default function DiseaseDetection() {
               </div>
               
               {result.message && result.message.includes("simulated") && (
-                <p style={styles.simulationNote}><em>Note: {result.message}</em></p>
+                <p style={styles.simulationNote}><em>{t.note || "Note:"} {result.message}</em></p>
               )}
               
               <div style={{ marginTop: "15px" }}>
-                <div style={styles.resultSubheading}>Explanation:</div>
+                <div style={styles.resultSubheading}>{t.explanation || "Explanation:"}</div>
                 <p style={styles.resultText}>{result.explanation}</p>
               </div>
             </div>

@@ -4,16 +4,26 @@ import translations from "../utils/translations";
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [lang, setLang] = useState(
-    localStorage.getItem("lang") || "en"
-  );
+  const [lang, setLang] = useState("en");
 
+  // Listen for custom language change events
   useEffect(() => {
-    localStorage.setItem("lang", lang);
-  }, [lang]);
+    const handleLanguageChange = () => {
+      // Force a re-render by updating state with the same value
+      setLang(prevLang => prevLang);
+    };
+    
+    window.addEventListener('languageChanged', handleLanguageChange);
+    
+    return () => {
+      window.removeEventListener('languageChanged', handleLanguageChange);
+    };
+  }, []);
+
+  const t = translations[lang];
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t: translations[lang] }}>
+    <LanguageContext.Provider value={{ lang, setLang, t }}>
       {children}
     </LanguageContext.Provider>
   );

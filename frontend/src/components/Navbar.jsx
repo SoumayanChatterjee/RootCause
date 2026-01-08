@@ -1,8 +1,10 @@
 import ProfileMenu from "./ProfileMenu";
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useLanguage } from '../hooks/useLanguage';
 
 export default function Navbar({ title }) {
+  const { t } = useLanguage();
   const [userName, setUserName] = useState("");
   const [userLocation, setUserLocation] = useState("");
   const location = useLocation();
@@ -45,7 +47,7 @@ export default function Navbar({ title }) {
         </div>
         {userRole === "FARMER" && userName && (
           <p style={styles.welcomeMessage}>
-            Welcome, <strong>{userName}</strong> {userLocation && `• ${userLocation}`}
+            {t.welcome || 'Welcome'}, <strong>{userName}</strong> {userLocation && `• ${userLocation}`}
           </p>
         )}
       </div>
@@ -56,7 +58,23 @@ export default function Navbar({ title }) {
         </nav>
       )}
       
-      <ProfileMenu />
+      {userRole === "ADMIN" && (
+        <button 
+          onClick={() => {
+            // Clear all credentials and user data
+            localStorage.clear();
+            
+            // Force a full page reload to ensure all states are reset
+            window.location.href = '/';
+          }}
+          style={styles.adminLogoutButton}
+        >
+          {t.logout || 'Logout'}
+        </button>
+      )}
+      
+      {userRole === "FARMER" && <ProfileMenu />}
+      {userRole !== "FARMER" && <ProfileMenu />}
     </div>
   );
 }
@@ -123,5 +141,22 @@ const styles = {
   },
   navIcon: {
     fontSize: '18px'
+  },
+  adminLogoutButton: {
+    padding: '10px 20px',
+    backgroundColor: '#f44336',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+  },
+  adminLogoutButtonHover: {
+    backgroundColor: '#d32f2f',
+    transform: 'translateY(-2px)',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
   }
 };

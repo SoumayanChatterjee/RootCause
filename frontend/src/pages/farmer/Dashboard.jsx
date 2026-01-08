@@ -1,5 +1,6 @@
 import FarmerLayout from "../../layouts/FarmerLayout";
 import { useState } from "react";
+import { useLanguage } from "../../hooks/useLanguage";
 import api from "../../services/api";
 
 export default function FarmerDashboard() {
@@ -9,6 +10,8 @@ export default function FarmerDashboard() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const { t } = useLanguage();
 
   const crops = [
     "Rice", "Wheat", "Corn", "Sugarcane", 
@@ -27,7 +30,7 @@ export default function FarmerDashboard() {
 
   const handleDetect = async () => {
     if (!selectedImage) {
-      setError("Please select an image first");
+      setError(t.pleaseSelectImage || "Please select an image first");
       return;
     }
 
@@ -62,7 +65,7 @@ export default function FarmerDashboard() {
       });
     } catch (err) {
       console.error("Disease detection error:", err);
-      setError(`Error detecting disease: ${err.response?.data?.message || err.message || "Please try again"}`);
+      setError(`${t.errorDetectingDisease || 'Error detecting disease'}: ${err.response?.data?.message || err.message || t.pleaseTryAgain || "Please try again"}`);
     } finally {
       setLoading(false);
     }
@@ -82,17 +85,17 @@ export default function FarmerDashboard() {
     <FarmerLayout title="Disease Detection">
       <div style={styles.container}>
         <div style={styles.hero}>
-          <h1 style={styles.title}>🌿 Crop Disease Detection</h1>
-          <p style={styles.subtitle}>Upload an image of your crop to detect diseases and get instant analysis</p>
+          <h1 style={styles.title}>🌿 {t.cropDiseaseDetection || 'Crop Disease Detection'}</h1>
+          <p style={styles.subtitle}>{t.uploadCropImagePrompt || 'Upload an image of your crop to detect diseases and get instant analysis'}</p>
         </div>
         
         <div style={styles.content}>
           <div style={styles.uploadSection}>
             <div style={styles.card}>
-              <h2 style={styles.cardTitle}>📸 Upload Image</h2>
+              <h2 style={styles.cardTitle}>📸 {t.uploadImage || 'Upload Image'}</h2>
               
               <div style={styles.formGroup}>
-                <label style={styles.label}>Select Crop Type:</label>
+                <label style={styles.label}>{t.selectCropType || 'Select Crop Type'}:</label>
                 <select 
                   value={selectedCrop} 
                   onChange={(e) => setSelectedCrop(e.target.value)}
@@ -106,7 +109,7 @@ export default function FarmerDashboard() {
               </div>
               
               <div style={styles.formGroup}>
-                <label style={styles.label}>Upload Crop/Leaf Image:</label>
+                <label style={styles.label}>{t.uploadCropImage || 'Upload Crop/Leaf Image'}:</label>
                 <div style={styles.fileInputWrapper}>
                   <input
                     type="file"
@@ -116,11 +119,11 @@ export default function FarmerDashboard() {
                     id="fileInput"
                   />
                   <label htmlFor="fileInput" style={styles.fileInputLabel}>
-                    📁 Choose Image
+                    📁 {t.chooseImage || 'Choose Image'}
                   </label>
                   {selectedImage && <span style={styles.fileName}>{selectedImage.name}</span>}
                 </div>
-                <p style={styles.hint}>Supported formats: .jpg, .jpeg, .png, .webp</p>
+                <p style={styles.hint}>{t.supportedFormats || 'Supported formats: .jpg, .jpeg, .png, .webp'}</p>
               </div>
               
               {previewUrl && (
@@ -135,7 +138,7 @@ export default function FarmerDashboard() {
                 style={loading || !selectedImage ? 
                   { ...styles.detectButton, ...styles.detectButtonDisabled } : styles.detectButton}
               >
-                {loading ? "🔄 Detecting..." : "🔬 Detect Disease"}
+                {loading ? `🔄 ${t.detecting || 'Detecting'}...` : `🔬 ${t.detectDisease || 'Detect Disease'}`}
               </button>
               
               {error && <div style={styles.error}>{error}</div>}
@@ -145,16 +148,16 @@ export default function FarmerDashboard() {
           {result && (
             <div style={styles.resultSection}>
               <div style={styles.card}>
-                <h2 style={styles.cardTitle}>📄 Detection Results</h2>
+                <h2 style={styles.cardTitle}>📄 {t.detectionResults || 'Detection Results'}</h2>
                 
                 <div style={styles.resultCard}>
                   <div style={styles.resultItem}>
-                    <div style={styles.resultLabel}>Disease Detected:</div>
+                    <div style={styles.resultLabel}>{t.diseaseDetected || 'Disease Detected'}:</div>
                     <div style={styles.diseaseName}>{result.disease}</div>
                   </div>
                   
                   <div style={styles.resultItem}>
-                    <div style={styles.resultLabel}>Confidence Level:</div>
+                    <div style={styles.resultLabel}>{t.confidenceLevel || 'Confidence Level'}:</div>
                     <div style={styles.confidenceContainer}>
                       <div style={styles.confidenceBar}>
                         <div style={{
@@ -167,7 +170,7 @@ export default function FarmerDashboard() {
                   </div>
                   
                   <div style={styles.resultItem}>
-                    <div style={styles.resultLabel}>Severity Level:</div>
+                    <div style={styles.resultLabel}>{t.severityLevel || 'Severity Level'}:</div>
                     <span style={{
                       ...styles.severityBadge,
                       ...(result.severity === "High" ? styles.severityHigh : 
@@ -179,12 +182,12 @@ export default function FarmerDashboard() {
                   
                   {result.message && result.message.includes("simulated") && (
                     <div style={styles.simulationNote}>
-                      <em>⚠️ Note: {result.message}</em>
+                      <em>⚠️ {t.note || 'Note'}: {result.message}</em>
                     </div>
                   )}
                   
                   <div style={styles.explanationBox}>
-                    <div style={styles.resultLabel}>📝 Explanation:</div>
+                    <div style={styles.resultLabel}>📝 {t.explanation || 'Explanation'}:</div>
                     <p style={styles.explanationText}>{result.explanation}</p>
                   </div>
                 </div>

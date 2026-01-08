@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from "../../hooks/useLanguage";
 import api from '../../services/api';
 
 const WeatherAlerts = () => {
@@ -7,6 +8,8 @@ const WeatherAlerts = () => {
   const [forecast, setForecast] = useState([]);
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const { t } = useLanguage();
   
   const locations = [
     'Maharashtra', 'Uttar Pradesh', 'Tamil Nadu', 'Karnataka', 
@@ -61,19 +64,19 @@ const WeatherAlerts = () => {
   if (loading) {
     return (
       <div style={styles.container}>
-        <h2>Weather Alerts</h2>
-        <div style={styles.loading}>Loading weather data for {selectedLocation}...</div>
+        <h2>{t.weatherAlerts || 'Weather Alerts'}</h2>
+        <div style={styles.loading}>{t.loadingWeatherData || 'Loading weather data for'} {selectedLocation}...</div>
       </div>
     );
   }
 
   return (
     <div style={styles.container}>
-      <h2>Weather Alerts</h2>
+      <h2>{t.weatherAlerts || 'Weather Alerts'}</h2>
       
       {/* Location Selector */}
       <div style={styles.locationSelector}>
-        <label htmlFor="location-select">Select Location: </label>
+        <label htmlFor="location-select">{t.selectLocation || 'Select Location'}: </label>
         <select 
           id="location-select"
           value={selectedLocation}
@@ -89,14 +92,14 @@ const WeatherAlerts = () => {
       {/* Current Weather */}
       <div style={styles.currentWeather}>
         <div style={styles.currentWeatherCard}>
-          <h3>Current Weather - {currentWeather.location || selectedLocation}</h3>
+          <h3>{t.currentWeather || 'Current Weather'} - {currentWeather.location || selectedLocation}</h3>
           <div style={styles.currentWeatherContent}>
             <div style={styles.temperature}>
               {(currentWeather.temperature || 28)}°C
             </div>
             <div style={styles.weatherDetails}>
-              <div>Condition: {currentWeather.condition || 'Partly Cloudy'}</div>
-              <div>Humidity: {(currentWeather.humidity || 65)}%</div>
+              <div>{t.condition || 'Condition'}: {currentWeather.condition || 'Partly Cloudy'}</div>
+              <div>{t.humidity || 'Humidity'}: {(currentWeather.humidity || 65)}%</div>
             </div>
           </div>
         </div>
@@ -104,7 +107,7 @@ const WeatherAlerts = () => {
 
       {/* 7-Day Forecast */}
       <div style={styles.forecastSection}>
-        <h3>7-Day Forecast</h3>
+        <h3>{t.sevenDayForecast || '7-Day Forecast'}</h3>
         <div style={styles.forecastGrid}>
           {(forecast || []).map((day, index) => (
             <div key={index} style={styles.forecastCard}>
@@ -121,7 +124,7 @@ const WeatherAlerts = () => {
                   {day.condition || 'Sunny'}
                 </div>
                 <div style={styles.precipitation}>
-                  💧 {(day.precipitation || 0)}% precip
+                  💧 {(day.precipitation || 0)}% {t.precip || 'precip'}
                 </div>
               </div>
             </div>
@@ -131,7 +134,7 @@ const WeatherAlerts = () => {
 
       {/* Planning Insights */}
       <div style={styles.insightsSection}>
-        <h3>7-Day Planning Insights</h3>
+        <h3>{t.sevenDayPlanningInsights || '7-Day Planning Insights'}</h3>
         <div style={styles.insightsList}>
           {(insights || []).map((insight, index) => (
             <div 

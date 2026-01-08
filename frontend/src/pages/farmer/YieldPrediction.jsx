@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../../services/api";
 import FarmerLayout from "../../layouts/FarmerLayout";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function YieldPrediction() {
   const [crop, setCrop] = useState("");
@@ -10,30 +11,57 @@ export default function YieldPrediction() {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  const { t } = useLanguage();
 
   // Updated crops and districts that match the trained model
   const crops = [
-    "Rice, paddy", "Wheat", "Maize", "Soybeans", 
-    "Cassava", "Potatoes", "Sweet potatoes", "Sorghum", "Yams"
+    t.ricePaddy || "Rice, paddy", t.wheat || "Wheat", t.maize || "Maize", t.soybeans || "Soybeans", 
+    t.cassava || "Cassava", t.potatoes || "Potatoes", t.sweetPotatoes || "Sweet potatoes", 
+    t.sorghum || "Sorghum", t.yams || "Yams"
   ];
 
   const seasons = [
-    "Kharif", "Rabi", "Zaid", "Spring", "Summer", "Winter", "Monsoon"
+    t.kharif || "Kharif", t.rabi || "Rabi", t.zaid || "Zaid", 
+    t.spring || "Spring", t.summer || "Summer", t.winter || "Winter", 
+    t.monsoon || "Monsoon"
   ];
 
   // Indian states for yield prediction
   const districts = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
-    "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
-    "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
-    "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
-    "Uttar Pradesh", "Uttarakhand", "West Bengal"
+    t.andhraPradesh || "Andhra Pradesh", 
+    t.arunachalPradesh || "Arunachal Pradesh", 
+    t.assam || "Assam", 
+    t.bihar || "Bihar", 
+    t.chhattisgarh || "Chhattisgarh",
+    t.goa || "Goa", 
+    t.gujarat || "Gujarat", 
+    t.haryana || "Haryana", 
+    t.himachalPradesh || "Himachal Pradesh", 
+    t.jharkhand || "Jharkhand",
+    t.karnataka || "Karnataka", 
+    t.kerala || "Kerala", 
+    t.madhyaPradesh || "Madhya Pradesh", 
+    t.maharashtra || "Maharashtra", 
+    t.manipur || "Manipur",
+    t.meghalaya || "Meghalaya", 
+    t.mizoram || "Mizoram", 
+    t.nagaland || "Nagaland", 
+    t.odisha || "Odisha", 
+    t.punjab || "Punjab",
+    t.rajasthan || "Rajasthan", 
+    t.sikkim || "Sikkim", 
+    t.tamilNadu || "Tamil Nadu", 
+    t.telangana || "Telangana", 
+    t.tripura || "Tripura",
+    t.uttarPradesh || "Uttar Pradesh", 
+    t.uttarakhand || "Uttarakhand", 
+    t.westBengal || "West Bengal"
   ];
 
   const handlePredict = async () => {
     if (!crop || !district || !year) {
-      setError("Please fill in Crop, State, and Year fields");
+      setError(t.pleaseFillCropStateYearFields || "Please fill in Crop, State, and Year fields");
       return;
     }
 
@@ -62,12 +90,12 @@ export default function YieldPrediction() {
       });
     } catch (err) {
       console.error("Yield prediction error:", err);
-      let errorMessage = "Error predicting yield. ";
+      let errorMessage = `${t.errorPredictingYield || "Error predicting yield"}. `;
       
       if (err.response?.data?.message?.includes("Invalid crop or district name")) {
-        errorMessage += "Please select valid crop and district from the dropdown options.";
+        errorMessage += t.selectValidCropDistrict || "Please select valid crop and district from the dropdown options.";
       } else {
-        errorMessage += err.response?.data?.message || err.message || "Please try again.";
+        errorMessage += err.response?.data?.message || err.message || t.pleaseTryAgain || "Please try again.";
       }
       
       setError(errorMessage);
@@ -104,19 +132,19 @@ export default function YieldPrediction() {
   };
 
   return (
-    <FarmerLayout title="Yield Prediction">
+    <FarmerLayout title={t.yieldPrediction || "Yield Prediction"}>
       <div style={styles.container}>
-        <h1 style={styles.heading}>📊 Yield Prediction</h1>
+        <h1 style={styles.heading}>📊 {t.yieldPrediction || "Yield Prediction"}</h1>
       
       <div style={styles.form}>
         <div style={styles.formGroup}>
-          <label style={styles.label}>Select Crop:</label>
+          <label style={styles.label}>{t.selectCrop || "Select Crop:"}</label>
           <select 
             value={crop} 
             onChange={(e) => setCrop(e.target.value)}
             style={styles.select}
           >
-            <option value="">-- Select Crop --</option>
+            <option value="">{t.selectCropOption || "-- Select Crop --"}</option>
             {crops.map(crop => (
               <option key={crop} value={crop}>{crop}</option>
             ))}
@@ -124,13 +152,13 @@ export default function YieldPrediction() {
         </div>
         
         <div style={styles.formGroup}>
-          <label style={styles.label}>Select Season:</label>
+          <label style={styles.label}>{t.selectSeason || "Select Season:"}</label>
           <select 
             value={season} 
             onChange={(e) => setSeason(e.target.value)}
             style={styles.select}
           >
-            <option value="">-- Select Season --</option>
+            <option value="">{t.selectSeasonOption || "-- Select Season --"}</option>
             {seasons.map(season => (
               <option key={season} value={season}>{season}</option>
             ))}
@@ -138,13 +166,13 @@ export default function YieldPrediction() {
         </div>
         
         <div style={styles.formGroup}>
-          <label style={styles.label}>Select State:</label>
+          <label style={styles.label}>{t.selectState || "Select State:"}</label>
           <select 
             value={district} 
             onChange={(e) => setDistrict(e.target.value)}
             style={styles.select}
           >
-            <option value="">-- Select State --</option>
+            <option value="">{t.selectStateOption || "-- Select State --"}</option>
             {districts.map(district => (
               <option key={district} value={district}>{district}</option>
             ))}
@@ -152,7 +180,7 @@ export default function YieldPrediction() {
         </div>
         
         <div style={styles.formGroup}>
-          <label style={styles.label}>Select Year:</label>
+          <label style={styles.label}>{t.selectYear || "Select Year:"}</label>
           <select 
             value={year} 
             onChange={(e) => setYear(e.target.value)}
@@ -170,7 +198,7 @@ export default function YieldPrediction() {
           style={loading || !crop || !district || !year ? 
             { ...styles.button, ...styles.buttonDisabled } : styles.button}
         >
-          {loading ? "Predicting..." : "Predict Yield"}
+          {loading ? `${t.predicting || "Predicting"}...` : t.predictYield || "Predict Yield"}
         </button>
         
         {error && <div style={styles.error}>{error}</div>}
@@ -178,22 +206,22 @@ export default function YieldPrediction() {
       
       {prediction && (
         <div style={styles.predictionResult}>
-          <h2 style={styles.resultHeading}>Yield Prediction Results</h2>
+          <h2 style={styles.resultHeading}>{t.yieldPredictionResults || "Yield Prediction Results"}</h2>
           <div style={styles.resultCard}>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Predicted Yield:</div>
+              <div style={styles.resultLabel}>{t.predictedYield || "Predicted Yield:"}</div>
               <div style={styles.resultValue}>
                 {prediction.predicted_yield} {prediction.unit}
               </div>
             </div>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Confidence Score:</div>
+              <div style={styles.resultLabel}>{t.confidenceScore || "Confidence Score:"}</div>
               <div style={styles.confidenceValue}>
                 {Math.round(prediction.confidence * 100)}%
               </div>
             </div>
             <div style={styles.confidenceContainer}>
-              <div style={styles.resultLabel}>Confidence Level:</div>
+              <div style={styles.resultLabel}>{t.confidenceLevel || "Confidence Level:"}</div>
               <div style={styles.confidenceBar}>
                 <div style={{
                   ...styles.confidenceFill,
@@ -204,13 +232,13 @@ export default function YieldPrediction() {
             </div>
             {prediction.message && prediction.message.includes("simulated") && (
               <div style={styles.simulationNote}>
-                <em>Note: {prediction.message}</em>
+                <em>{t.note || "Note:"} {prediction.message}</em>
               </div>
             )}
           </div>
           
           <div style={styles.recommendations}>
-            <h3 style={styles.recommendationsHeading}>Farming Recommendations:</h3>
+            <h3 style={styles.recommendationsHeading}>{t.farmingRecommendations || "Farming Recommendations:"}</h3>
             <ul style={styles.recommendationList}>
               {prediction.farmingRecommendations.map((rec, index) => (
                 <li key={index} style={styles.recommendationItem}>

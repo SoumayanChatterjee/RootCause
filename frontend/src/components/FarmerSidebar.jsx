@@ -1,8 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useLanguage } from "../hooks/useLanguage";
 
-function SidebarLink({ to, icon, text }) {
+function SidebarLink({ to, icon, translationKey }) {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useLanguage();
   
   return (
     <NavLink 
@@ -16,22 +18,24 @@ function SidebarLink({ to, icon, text }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <span style={styles.icon}>{icon}</span>
-      <span style={styles.text}>{text}</span>
+      <span style={styles.text}>{t[translationKey]}</span>
     </NavLink>
   );
 }
 
 export default function FarmerSidebar() {
+  const { t } = useLanguage();
+  
   return (
     <div style={styles.sidebar}>
       <div style={styles.sidebarHeader}>
-        <h3 style={styles.headerTitle}>Navigation</h3>
+        <h3 style={styles.headerTitle}>{t.navigation || 'Navigation'}</h3>
       </div>
       
       <nav style={styles.nav}>
-        <SidebarLink to="/farmer/dashboard" icon="🔬" text="Disease Detection" />
-        <SidebarLink to="/farmer/treatment" icon="💊" text="Treatment" />
-        <SidebarLink to="/farmer/yield" icon="📊" text="Yield Prediction" />
+        <SidebarLink to="/farmer/dashboard" icon="🔍" translationKey="diseaseDetection" />
+        <SidebarLink to="/farmer/treatment" icon="💊" translationKey="treatment" />
+        <SidebarLink to="/farmer/yield" icon="📈" translationKey="yieldPrediction" />
       </nav>
     </div>
   );
@@ -40,7 +44,7 @@ export default function FarmerSidebar() {
 const styles = {
   sidebar: {
     position: 'fixed',
-    left: 0,
+    left: '10px',
     top: '80px',
     width: '240px',
     height: 'calc(100vh - 80px)',

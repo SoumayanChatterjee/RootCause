@@ -1,17 +1,20 @@
 import React from 'react';
+import { useLanguage } from '../../hooks/useLanguage';
 
 const Sidebar = ({ activeModule, setActiveModule }) => {
+  const { t } = useLanguage();
+  
   const menuItems = [
-    { id: 'region-overview', label: 'Region Overview', icon: '🌍' },
-    { id: 'weather-alerts', label: 'Weather Alerts', icon: '🌤️' },
-    { id: 'farm-statistics', label: 'Farm Statistics', icon: '📊' },
+    { id: 'region-overview', label: t.regionOverview || 'Region Overview', icon: '🌍' },
+    { id: 'weather-alerts', label: t.weatherAlerts || 'Weather Alerts', icon: '🌤️' },
+    { id: 'farm-statistics', label: t.farmStatistics || 'Farm Statistics', icon: '📊' },
   ];
 
   return (
     <div style={styles.sidebar}>
       <div style={styles.logo}>
-        <h2>🌾 RootCause</h2>
-        <p>Admin Panel</p>
+        <h2>🌾 {t.rootCause || 'RootCause'}</h2>
+        <p>{t.adminPanel || 'Admin Panel'}</p>
       </div>
       <nav style={styles.nav}>
         <ul style={styles.menu}>
@@ -31,6 +34,18 @@ const Sidebar = ({ activeModule, setActiveModule }) => {
           ))}
         </ul>
       </nav>
+      
+      <div style={styles.logoutContainer}>
+        <button
+          onClick={() => {
+            localStorage.clear();
+            window.location.href = "/";
+          }}
+          style={styles.logoutButton}
+        >
+          {t.logout || 'Logout'}
+        </button>
+      </div>
     </div>
   );
 };
@@ -82,6 +97,26 @@ const styles = {
   icon: {
     marginRight: '10px',
     fontSize: '18px',
+  },
+  logoutContainer: {
+    padding: '20px',
+    borderTop: '1px solid #2c3e50',
+    marginTop: 'auto',
+  },
+  logoutButton: {
+    width: '100%',
+    padding: '15px',
+    backgroundColor: '#e74c3c',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s',
+  },
+  logoutButtonHover: {
+    backgroundColor: '#c0392b',
   },
 };
 

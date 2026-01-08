@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from "../../hooks/useLanguage";
 import api from '../../services/api';
 
 const FarmStatistics = () => {
@@ -7,47 +8,48 @@ const FarmStatistics = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [showFarmerDetails, setShowFarmerDetails] = useState(false);
   const [loading, setLoading] = useState(true);
+  
+  const { t } = useLanguage();
 
   useEffect(() => {
-    fetchFarmStats();
+    fetchAllFarmers();
   }, []);
 
-  const fetchFarmStats = async () => {
+  const fetchAllFarmers = async () => {
     try {
-      const response = await api.get('/admin/farm-statistics');
-      setFarmStats(response.data.farms || []);
+      const response = await api.get('/dashboard/admin/farmers');
+      setFarmStats(response.data || []);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching farm stats:', error);
+      console.error('Error fetching farmers:', error);
       // Fallback to sample data if API fails
       setFarmStats([
-        { id: 1, district: 'Pune', cropType: 'Sugarcane', diseaseRisk: 'Low', farmersAffected: 45, status: 'Resolved' },
-        { id: 2, district: 'Nashik', cropType: 'Grapes', diseaseRisk: 'High', farmersAffected: 120, status: 'In Progress' },
-        { id: 3, district: 'Mumbai', cropType: 'Vegetables', diseaseRisk: 'Medium', farmersAffected: 78, status: 'Detected' },
-        { id: 4, district: 'Thane', cropType: 'Rice', diseaseRisk: 'Low', farmersAffected: 32, status: 'Resolved' },
-        { id: 5, district: 'Nagpur', cropType: 'Oranges', diseaseRisk: 'High', farmersAffected: 95, status: 'In Progress' },
-        { id: 6, district: 'Aurangabad', cropType: 'Cotton', diseaseRisk: 'Medium', farmersAffected: 67, status: 'Detected' },
-        { id: 7, district: 'Solapur', cropType: 'Soybean', diseaseRisk: 'Low', farmersAffected: 54, status: 'Resolved' },
-        { id: 8, district: 'Amravati', cropType: 'Wheat', diseaseRisk: 'High', farmersAffected: 89, status: 'In Progress' },
+        { _id: 1, name: 'Rajesh Kumar', phone: '+91 9876543210', district: 'Pune', city: 'Pimpri', village: 'Wakad', language: 'en', role: 'FARMER' },
+        { _id: 2, name: 'Priya Sharma', phone: '+91 9876543211', district: 'Nashik', city: 'Nashik Road', village: 'Ganpati Nagar', language: 'en', role: 'FARMER' },
+        { _id: 3, name: 'Amit Patel', phone: '+91 9876543212', district: 'Mumbai', city: 'Mumbai Suburban', village: 'Andheri', language: 'en', role: 'FARMER' },
+        { _id: 4, name: 'Sunita Devi', phone: '+91 9876543213', district: 'Thane', city: 'Thane', village: 'Kasarvadavali', language: 'en', role: 'FARMER' },
+        { _id: 5, name: 'Vijay Singh', phone: '+91 9876543214', district: 'Nagpur', city: 'Nagpur', village: 'Dharampeth', language: 'en', role: 'FARMER' },
       ]);
       setLoading(false);
     }
   };
 
+  // We don't need district-specific farmer details anymore since we're showing all farmers
   const fetchFarmerDetails = async (district) => {
     try {
-      const response = await api.get(`/admin/farm-statistics/${district}/farmers`);
-      setFarmerDetails(response.data.farmers || []);
+      const response = await api.get(`/dashboard/admin/farmers`);
+      setFarmerDetails(response.data || []);
     } catch (error) {
       console.error('Error fetching farmer details:', error);
       // Fallback to sample data if API fails
       setFarmerDetails([
-        { id: 1, name: 'Rajesh Kumar', phone: '+91 9876543210', fieldDetails: '2 acres, Sugarcane crop', actionTaken: 'Fungicide applied', status: 'Resolved', activity: 'Applied treatment, scheduled follow-up' },
-        { id: 2, name: 'Priya Sharma', phone: '+91 9876543211', fieldDetails: '1.5 acres, Sugarcane crop', actionTaken: 'Irrigation increased', status: 'Resolved', activity: 'Completed irrigation upgrade' },
-        { id: 3, name: 'Amit Patel', phone: '+91 9876543212', fieldDetails: '3 acres, Sugarcane crop', actionTaken: 'Pesticides applied', status: 'In Progress', activity: 'Monitoring crop health' },
+        { _id: 1, name: 'Rajesh Kumar', phone: '+91 9876543210', district: 'Pune', city: 'Pimpri', village: 'Wakad', language: 'en', role: 'FARMER' },
+        { _id: 2, name: 'Priya Sharma', phone: '+91 9876543211', district: 'Nashik', city: 'Nashik Road', village: 'Ganpati Nagar', language: 'en', role: 'FARMER' },
+        { _id: 3, name: 'Amit Patel', phone: '+91 9876543212', district: 'Mumbai', city: 'Mumbai Suburban', village: 'Andheri', language: 'en', role: 'FARMER' },
       ]);
     }
   };
+
 
   const getRiskColor = (risk) => {
     switch(risk.toLowerCase()) {
@@ -81,114 +83,46 @@ const FarmStatistics = () => {
   if (loading) {
     return (
       <div style={styles.container}>
-        <h2>Farm Statistics</h2>
-        <div style={styles.loading}>Loading farm statistics...</div>
+        <h2>{t.farmStatistics || 'Farm Statistics'}</h2>
+        <div style={styles.loading}>{t.loadingFarmStats || 'Loading farm statistics...'}</div>
       </div>
     );
   }
 
   return (
     <div style={styles.container}>
-      <h2>Farm Statistics</h2>
-      
+      <h2>{t.allFarmersDatabase || 'All Farmers Database'}</h2>
+        
       <div style={styles.tableContainer}>
         <table style={styles.table}>
           <thead>
             <tr style={styles.tableHeader}>
-              <th>District</th>
-              <th>Crop Type</th>
-              <th>Disease Risk Level</th>
-              <th>Number of Farmers Affected</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={styles.tableHeaderCell}>{t.name || 'Name'}</th>
+              <th style={styles.tableHeaderCell}>{t.phoneNumber || 'Phone Number'}</th>
+              <th style={styles.tableHeaderCell}>{t.district || 'District'}</th>
+              <th style={styles.tableHeaderCell}>{t.city || 'City'}</th>
+              <th style={styles.tableHeaderCell}>{t.village || 'Village'}</th>
+              <th style={styles.tableHeaderCell}>{t.language || 'Language'}</th>
+              <th style={styles.tableHeaderCell}>{t.role || 'Role'}</th>
             </tr>
           </thead>
           <tbody>
-            {(farmStats || []).map(stat => (
-              <tr key={stat.id} style={styles.tableRow}>
-                <td style={styles.tableCell}>{stat.district}</td>
-                <td style={styles.tableCell}>{stat.cropType}</td>
-                <td style={styles.tableCell}>
-                  <span 
-                    style={{
-                      ...styles.riskBadge,
-                      backgroundColor: getRiskColor(stat.diseaseRisk)
-                    }}
-                  >
-                    {stat.diseaseRisk}
-                  </span>
-                </td>
-                <td style={styles.tableCell}>{stat.farmersAffected}</td>
-                <td style={styles.tableCell}>
-                  <span 
-                    style={{
-                      ...styles.statusBadge,
-                      backgroundColor: getStatusColor(stat.status)
-                    }}
-                  >
-                    {stat.status}
-                  </span>
-                </td>
-                <td style={styles.tableCell}>
-                  <button 
-                    style={styles.viewDetailsButton}
-                    onClick={() => handleDistrictClick(stat.district)}
-                  >
-                    View Details
-                  </button>
-                </td>
+            {(farmStats || []).map(farmer => (
+              <tr key={farmer._id} style={styles.tableRow}>
+                <td style={{...styles.tableCell, ...styles.nameCell}}>{farmer.name}</td>
+                <td style={{...styles.tableCell, ...styles.phoneCell}}>{farmer.phone}</td>
+                <td style={{...styles.tableCell, ...styles.locationCell}}>{farmer.district}</td>
+                <td style={{...styles.tableCell, ...styles.locationCell}}>{farmer.city}</td>
+                <td style={{...styles.tableCell, ...styles.locationCell}}>{farmer.village}</td>
+                <td style={{...styles.tableCell, ...styles.languageCell}}>{farmer.language}</td>
+                <td style={{...styles.tableCell, ...styles.roleCell}}>{farmer.role}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {/* Farmer Details Modal */}
-      {showFarmerDetails && (
-        <div style={styles.modalOverlay} onClick={closeFarmerDetails}>
-          <div style={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h3>Farmer Details - {selectedDistrict}</h3>
-              <button style={styles.closeButton} onClick={closeFarmerDetails}>×</button>
-            </div>
-            <div style={styles.modalBody}>
-              <table style={styles.farmerTable}>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Phone Number</th>
-                    <th>Field Details</th>
-                    <th>Action Taken</th>
-                    <th>Activity in Farmer Dashboard</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(farmerDetails || []).map(farmer => (
-                    <tr key={farmer.id}>
-                      <td>{farmer.name}</td>
-                      <td>{farmer.phone}</td>
-                      <td>{farmer.fieldDetails}</td>
-                      <td>{farmer.actionTaken}</td>
-                      <td>{farmer.activity || 'No activity recorded'}</td>
-                      <td>
-                        <span 
-                          style={{
-                            ...styles.statusBadge,
-                            backgroundColor: getStatusColor(farmer.status)
-                          }}
-                        >
-                          {farmer.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
+  
+      {/* We don't need the farmer details modal anymore since we're showing all farmer details */}
     </div>
   );
 };

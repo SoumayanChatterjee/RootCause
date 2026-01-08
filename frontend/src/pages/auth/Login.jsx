@@ -1,9 +1,27 @@
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../hooks/useLanguage";
 import translations from "../../utils/translations";
 
 function Login({ language }) {
   const navigate = useNavigate();
-  const t = translations[language || "en"];
+  const { lang, setLang, t } = useLanguage();
+
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "hi", name: "हिन्दी" },
+    { code: "bn", name: "বাংলা" },
+    { code: "ta", name: "தமிழ்" },
+    { code: "te", name: "తెలుగు" },
+    { code: "mr", name: "मराठी" }
+  ];
+
+  const handleLanguageChange = (e) => {
+    const selectedLang = e.target.value;
+    setLang(selectedLang);
+    
+    // Dispatch a custom event to notify other parts of the app about language change
+    window.dispatchEvent(new Event('languageChanged'));
+  };
 
   return (
     <div style={styles.container}>
@@ -12,6 +30,20 @@ function Login({ language }) {
           <span style={styles.logo}>🌱</span>
           <h1 style={styles.title}>RootCause</h1>
           <p style={styles.subtitle}>AI-Powered Crop Disease Detection & Yield Prediction</p>
+          
+          <div style={styles.languageSelectorContainer}>
+            <select 
+              value={lang} 
+              onChange={handleLanguageChange}
+              style={styles.languageSelect}
+            >
+              {languages.map((language) => (
+                <option key={language.code} value={language.code}>
+                  {language.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <h2 style={styles.heading}>{t.login}</h2>
@@ -160,6 +192,23 @@ const styles = {
   divider: {
     color: "#ccc",
     fontSize: "15px"
+  },
+  languageSelectorContainer: {
+    marginTop: "20px",
+    display: "flex",
+    justifyContent: "center"
+  },
+  languageSelect: {
+    padding: "10px 15px",
+    fontSize: "16px",
+    borderRadius: "8px",
+    border: "2px solid #c8e6c9",
+    backgroundColor: "#f1f8e9",
+    color: "#2d5016",
+    outline: "none",
+    cursor: "pointer",
+    minWidth: "150px",
+    transition: "border-color 0.3s ease"
   }
 };
 

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from "../../hooks/useLanguage";
 import api from '../../services/api';
 
 const RegionOverview = () => {
   const [statesData, setStatesData] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const { t } = useLanguage();
   
   useEffect(() => {
     fetchRegionData();
@@ -46,29 +49,29 @@ const RegionOverview = () => {
 
   const getStatusLabel = (status) => {
     switch(status) {
-      case 'healthy': return 'Healthy';
-      case 'moderate': return 'Moderate Stress';
-      case 'high': return 'High Stress';
-      case 'pest': return 'Pest Outbreak';
-      default: return 'Unknown';
+      case 'healthy': return t.healthy || 'Healthy';
+      case 'moderate': return t.moderateStress || 'Moderate Stress';
+      case 'high': return t.highStress || 'High Stress';
+      case 'pest': return t.pestOutbreak || 'Pest Outbreak';
+      default: return t.unknown || 'Unknown';
     }
   };
 
   if (loading) {
     return (
       <div style={styles.container}>
-        <h2>Region Overview</h2>
-        <div style={styles.loading}>Loading region data...</div>
+        <h2>{t.regionOverview || 'Region Overview'}</h2>
+        <div style={styles.loading}>{t.loadingRegionData || 'Loading region data...'}</div>
       </div>
     );
   }
 
   return (
     <div style={styles.container}>
-      <h2>Region Overview</h2>
+      <h2>{t.regionOverview || 'Region Overview'}</h2>
       <div style={styles.mapContainer}>
         <div style={styles.map}>
-          <div style={styles.mapTitle}>State Health Status</div>
+          <div style={styles.mapTitle}>{t.stateHealthStatus || 'State Health Status'}</div>
           <div style={styles.indiaMap}>
             {/* Simplified SVG representation of India with state boundaries */}
             <svg viewBox="0 0 800 600" style={styles.svgMap}>
@@ -113,23 +116,23 @@ const RegionOverview = () => {
       </div>
       
       <div style={styles.legend}>
-        <h3>Status Legend</h3>
+        <h3>{t.statusLegend || 'Status Legend'}</h3>
         <div style={styles.legendItems}>
           <div style={styles.legendItem}>
             <div style={{...styles.legendColor, backgroundColor: '#2ecc71'}}></div>
-            <span>Healthy</span>
+            <span>{t.healthy || 'Healthy'}</span>
           </div>
           <div style={styles.legendItem}>
             <div style={{...styles.legendColor, backgroundColor: '#f1c40f'}}></div>
-            <span>Moderate Stress</span>
+            <span>{t.moderateStress || 'Moderate Stress'}</span>
           </div>
           <div style={styles.legendItem}>
             <div style={{...styles.legendColor, backgroundColor: '#e67e22'}}></div>
-            <span>High Stress</span>
+            <span>{t.highStress || 'High Stress'}</span>
           </div>
           <div style={styles.legendItem}>
             <div style={{...styles.legendColor, backgroundColor: '#e74c3c'}}></div>
-            <span>Pest Outbreak</span>
+            <span>{t.pestOutbreak || 'Pest Outbreak'}</span>
           </div>
         </div>
       </div>

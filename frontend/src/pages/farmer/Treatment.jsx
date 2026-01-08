@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FarmerLayout from "../../layouts/FarmerLayout";
+import { useLanguage } from "../../hooks/useLanguage";
 
 export default function Treatment() {
   const [symptoms, setSymptoms] = useState([]);
@@ -8,12 +9,20 @@ export default function Treatment() {
   const [severity, setSeverity] = useState("");
   const [treatment, setTreatment] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  const { t } = useLanguage();
 
   const symptomOptions = [
-    "Yellowing leaves", "Brown spots on leaves", "Wilting", 
-    "Stunted growth", "Powdery coating", "Holes in leaves",
-    "Black spots", "Rust colored patches", "Leaf curling", 
-    "Stem cankers"
+    t.yellowingLeaves || "Yellowing leaves", 
+    t.brownSpotsOnLeaves || "Brown spots on leaves", 
+    t.wilting || "Wilting", 
+    t.stuntedGrowth || "Stunted growth", 
+    t.powderyCoating || "Powdery coating", 
+    t.holesInLeaves || "Holes in leaves",
+    t.blackSpots || "Black spots", 
+    t.rustColoredPatches || "Rust colored patches", 
+    t.leafCurling || "Leaf curling", 
+    t.stemCankers || "Stem cankers"
   ];
 
   const toggleSymptom = (symptom) => {
@@ -59,13 +68,13 @@ export default function Treatment() {
   };
 
   return (
-    <FarmerLayout title="Treatment Recommendation">
+    <FarmerLayout title={t.treatmentRecommendation || "Treatment Recommendation"}>
       <div style={styles.container}>
-        <h1 style={styles.heading}>💊 Crop Disease Treatment</h1>
+        <h1 style={styles.heading}>💊 {t.cropDiseaseTreatment || "Crop Disease Treatment"}</h1>
       
       <div style={styles.form}>
         <div style={styles.formGroup}>
-          <label style={styles.label}>Select Observed Symptoms:</label>
+          <label style={styles.label}>{t.selectObservedSymptoms || "Select Observed Symptoms:"}</label>
           <div style={styles.symptomGrid}>
             {symptomOptions.map(symptom => (
               <div 
@@ -83,37 +92,37 @@ export default function Treatment() {
         </div>
         
         <div style={styles.formGroup}>
-          <label style={styles.label}>Total Farm Size (in acres):</label>
+          <label style={styles.label}>{t.totalFarmSizeAcres || "Total Farm Size (in acres):"}</label>
           <input
             type="number"
             value={farmSize}
             onChange={(e) => setFarmSize(e.target.value)}
             style={styles.input}
-            placeholder="Enter farm size"
+            placeholder={t.enterFarmSize || "Enter farm size"}
           />
         </div>
         
         <div style={styles.formGroup}>
-          <label style={styles.label}>Affected Area (in acres):</label>
+          <label style={styles.label}>{t.affectedAreaAcres || "Affected Area (in acres):"}</label>
           <input
             type="number"
             value={affectedArea}
             onChange={(e) => setAffectedArea(e.target.value)}
             style={styles.input}
-            placeholder="Enter affected area"
+            placeholder={t.enterAffectedArea || "Enter affected area"}
           />
         </div>
         
         <div style={styles.formGroup}>
-          <label style={styles.label}>Disease Severity:</label>
+          <label style={styles.label}>{t.diseaseSeverity || "Disease Severity:"}</label>
           <select
             value={severity}
             onChange={(e) => setSeverity(e.target.value)}
             style={styles.select}
           >
-            <option value="">-- Select Severity --</option>
-            <option value="Mild">Mild</option>
-            <option value="Severe">Severe</option>
+            <option value="">{t.selectSeverity || "-- Select Severity --"}</option>
+            <option value="Mild">{t.mild || "Mild"}</option>
+            <option value="Severe">{t.severe || "Severe"}</option>
           </select>
         </div>
         
@@ -123,32 +132,32 @@ export default function Treatment() {
           style={loading || symptoms.length === 0 || !farmSize || !affectedArea || !severity ? 
             { ...styles.button, ...styles.buttonDisabled } : styles.button}
         >
-          {loading ? "Getting Recommendation..." : "Get Treatment Recommendation"}
+          {loading ? `${t.gettingRecommendation || "Getting Recommendation"}...` : t.getTreatmentRecommendation || "Get Treatment Recommendation"}
         </button>
       </div>
       
       {treatment && (
         <div style={styles.treatmentResult}>
-          <h2 style={styles.resultHeading}>Treatment Recommendation</h2>
+          <h2 style={styles.resultHeading}>{t.treatmentRecommendation || "Treatment Recommendation"}</h2>
           <div style={styles.resultCard}>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Recommended Medicine:</div>
+              <div style={styles.resultLabel}>{t.recommendedMedicine || "Recommended Medicine:"}</div>
               <div style={styles.resultValue}>{treatment.medicine}</div>
             </div>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Dosage:</div>
+              <div style={styles.resultLabel}>{t.dosage || "Dosage:"}</div>
               <div style={styles.resultValue}>{treatment.dosage}</div>
             </div>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Application Method:</div>
+              <div style={styles.resultLabel}>{t.applicationMethod || "Application Method:"}</div>
               <div style={styles.resultValue}>{treatment.applicationMethod}</div>
             </div>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Frequency:</div>
+              <div style={styles.resultLabel}>{t.frequency || "Frequency:"}</div>
               <div style={styles.resultValue}>{treatment.frequency}</div>
             </div>
             <div style={styles.resultItem}>
-              <div style={styles.resultLabel}>Safety Instructions:</div>
+              <div style={styles.resultLabel}>{t.safetyInstructions || "Safety Instructions:"}</div>
               <div style={styles.resultValue}>{treatment.safetyInstructions}</div>
             </div>
           </div>

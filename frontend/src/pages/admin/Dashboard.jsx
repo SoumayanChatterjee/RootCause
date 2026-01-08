@@ -1,5 +1,6 @@
 import AdminLayout from "../../layouts/AdminLayout";
 import React, { useState } from 'react';
+import { useLanguage } from "../../hooks/useLanguage";
 import Sidebar from '../../components/admin/Sidebar';
 import RegionOverview from './RegionOverview';
 import WeatherAlerts from './WeatherAlerts';
@@ -7,6 +8,8 @@ import FarmStatistics from './FarmStatistics';
 
 const AdminDashboard = () => {
   const [activeModule, setActiveModule] = useState('region-overview');
+  
+  const { t } = useLanguage();
 
   const renderActiveModule = () => {
     switch(activeModule) {
@@ -26,7 +29,7 @@ const AdminDashboard = () => {
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       <div style={styles.mainContent}>
         <header style={styles.header}>
-          <h1>Admin Dashboard</h1>
+          <h1>{t.adminDashboard || 'Admin Dashboard'}</h1>
         </header>
         <main style={styles.main}>
           {renderActiveModule()}
