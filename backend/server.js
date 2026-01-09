@@ -34,6 +34,8 @@ app.get("/", (req, res) => {
   res.send("RootCause Backend Running");
 });
 
+
+
 // MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)

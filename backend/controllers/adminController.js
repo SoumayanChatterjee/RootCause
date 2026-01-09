@@ -84,15 +84,50 @@ exports.getWeatherAlerts = async (req, res) => {
       return res.status(500).json({ message: "Weather API key not configured" });
     }
     
-    // Fetch current weather data
-    const currentWeatherResponse = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
-    );
+    // Map state names to major cities for better API results
+    const stateCityMap = {
+      'Maharashtra': 'Mumbai',
+      'Uttar Pradesh': 'Lucknow',
+      'Tamil Nadu': 'Chennai',
+      'Karnataka': 'Bangalore',
+      'Andhra Pradesh': 'Hyderabad', // Using Hyderabad as it's still a major city in the region
+      'Gujarat': 'Ahmedabad',
+      'Rajasthan': 'Jaipur',
+      'West Bengal': 'Kolkata',
+      'Punjab': 'Chandigarh',
+      'Haryana': 'Chandigarh'
+    };
     
-    // Fetch 5-day forecast data (OpenWeatherMap provides 3-hourly data for 5 days)
-    const forecastResponse = await axios.get(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${location}&appid=${apiKey}&units=metric`
-    );
+    // Use city name if available, otherwise use location as is
+    const cityName = stateCityMap[location] || location;
+    
+    let currentWeatherResponse, forecastResponse;
+    
+    try {
+      // Fetch current weather data
+      currentWeatherResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`
+      );
+      
+      // Fetch 5-day forecast data (OpenWeatherMap provides 3-hourly data for 5 days)
+      forecastResponse = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`
+      );
+    } catch (apiError) {
+      // If the city name fails, try the original location name
+      if (apiError.response && apiError.response.status === 404) {
+        currentWeatherResponse = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
+        );
+        
+        forecastResponse = await axios.get(
+          `https://api.openweathermap.org/data/2.5/forecast?q=${location}&appid=${apiKey}&units=metric`
+        );
+      } else {
+        // If it's not a 404 error, rethrow it
+        throw apiError;
+      }
+    }
     
     // Process current weather data
     const current = {
@@ -205,31 +240,12 @@ exports.getWeatherAlerts = async (req, res) => {
       return res.status(500).json({ message: "Invalid weather API key" });
     }
     
-    // Fallback to sample data if API fails
-    const weatherData = {
-      current: {
-        temperature: Math.floor(Math.random() * 10) + 25, // Random temp between 25-35
-        humidity: Math.floor(Math.random() * 20) + 60,    // Random humidity between 60-80
-        condition: ["Sunny", "Partly Cloudy", "Cloudy", "Light Rain"][Math.floor(Math.random() * 4)],
-        location: location
-      },
-      forecast: [
-        { day: "Monday", date: "Jan 8", temp: { min: 22, max: 32 }, precipitation: 10, condition: "Light Rain" },
-        { day: "Tuesday", date: "Jan 9", temp: { min: 23, max: 34 }, precipitation: 0, condition: "Sunny" },
-        { day: "Wednesday", date: "Jan 10", temp: { min: 21, max: 30 }, precipitation: 80, condition: "Heavy Rainfall" },
-        { day: "Thursday", date: "Jan 11", temp: { min: 24, max: 33 }, precipitation: 20, condition: "Cloudy" },
-        { day: "Friday", date: "Jan 12", temp: { min: 25, max: 35 }, precipitation: 5, condition: "Sunny" },
-        { day: "Saturday", date: "Jan 13", temp: { min: 23, max: 31 }, precipitation: 90, condition: "Heavy Rainfall" },
-        { day: "Sunday", date: "Jan 14", temp: { min: 22, max: 29 }, precipitation: 70, condition: "Moderate Rain" }
-      ],
-      insights: [
-        { day: "Wednesday", message: "Heavy rainfall expected - High risk for planting activities", type: "warning" },
-        { day: "Saturday", message: "Heavy rainfall expected - Potential flooding risk", type: "danger" },
-        { day: "Sunday", message: "Moderate rainfall - Good for irrigation, avoid pesticide application", type: "info" }
-      ]
-    };
-    
-    res.json(weatherData);
+    // If API fails, return error instead of hardcoded data
+    console.error('Weather API call failed:', error.message);
+    return res.status(500).json({ 
+      error: 'Failed to fetch weather data', 
+      message: error.message 
+    });
   }
 };
 

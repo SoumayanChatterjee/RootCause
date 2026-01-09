@@ -8,6 +8,7 @@ const WeatherAlerts = () => {
   const [forecast, setForecast] = useState([]);
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
   
   const { t } = useLanguage();
   
@@ -23,8 +24,14 @@ const WeatherAlerts = () => {
 
   const fetchWeatherData = async () => {
     try {
-      setLoading(true);
-      const response = await api.get(`/admin/weather-alerts/${selectedLocation}`);
+      console.log('Fetching weather data for location:', selectedLocation);
+      if(initialLoad) {
+        setLoading(true);
+      }
+      setInitialLoad(false);
+      const response = await api.get(`/dashboard/admin/weather-alerts/${selectedLocation}`);
+      
+      console.log('Weather API Response:', response.data);
       
       setCurrentWeather(response.data.current || {});
       setForecast(response.data.forecast || []);
@@ -33,35 +40,19 @@ const WeatherAlerts = () => {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching weather data:', error);
-      // Fallback to sample data if API fails
-      setCurrentWeather({
-        temperature: 28,
-        humidity: 65,
-        condition: 'Partly Cloudy',
-        location: selectedLocation
-      });
+      console.error('Error response status:', error.response?.status);
+      console.error('Error response data:', error.response?.data);
+      console.error('Selected location:', selectedLocation);
       
-      setForecast([
-        { day: 'Monday', date: 'Jan 8', temp: { min: 22, max: 32 }, precipitation: 10, condition: 'Light Rain' },
-        { day: 'Tuesday', date: 'Jan 9', temp: { min: 23, max: 34 }, precipitation: 0, condition: 'Sunny' },
-        { day: 'Wednesday', date: 'Jan 10', temp: { min: 21, max: 30 }, precipitation: 80, condition: 'Heavy Rainfall' },
-        { day: 'Thursday', date: 'Jan 11', temp: { min: 24, max: 33 }, precipitation: 20, condition: 'Cloudy' },
-        { day: 'Friday', date: 'Jan 12', temp: { min: 25, max: 35 }, precipitation: 5, condition: 'Sunny' },
-        { day: 'Saturday', date: 'Jan 13', temp: { min: 23, max: 31 }, precipitation: 90, condition: 'Heavy Rainfall' },
-        { day: 'Sunday', date: 'Jan 14', temp: { min: 22, max: 29 }, precipitation: 70, condition: 'Moderate Rain' },
-      ]);
+      console.error('Weather API call failed:', error);
       
-      setInsights([
-        { day: 'Wednesday', message: 'Heavy rainfall expected - High risk for planting activities', type: 'warning' },
-        { day: 'Saturday', message: 'Heavy rainfall expected - Potential flooding risk', type: 'danger' },
-        { day: 'Sunday', message: 'Moderate rainfall - Good for irrigation, avoid pesticide application', type: 'info' },
-      ]);
-      
+      // Don't reset data on error to preserve any previously loaded data
+      // Only show error in console, keep UI as is
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (initialLoad || loading) {
     return (
       <div style={styles.container}>
         <h2>{t.weatherAlerts || 'Weather Alerts'}</h2>
@@ -95,11 +86,11 @@ const WeatherAlerts = () => {
           <h3>{t.currentWeather || 'Current Weather'} - {currentWeather.location || selectedLocation}</h3>
           <div style={styles.currentWeatherContent}>
             <div style={styles.temperature}>
-              {(currentWeather.temperature || 28)}°C
+              {currentWeather.temperature !== undefined ? `${currentWeather.temperature}°C` : 'Loading...'}
             </div>
             <div style={styles.weatherDetails}>
-              <div>{t.condition || 'Condition'}: {currentWeather.condition || 'Partly Cloudy'}</div>
-              <div>{t.humidity || 'Humidity'}: {(currentWeather.humidity || 65)}%</div>
+              <div>{t.condition || 'Condition'}: {currentWeather.condition || 'Loading...'}</div>
+              <div>{t.humidity || 'Humidity'}: {currentWeather.humidity !== undefined ? `${currentWeather.humidity}%` : 'Loading...'}</div>
             </div>
           </div>
         </div>
@@ -109,26 +100,29 @@ const WeatherAlerts = () => {
       <div style={styles.forecastSection}>
         <h3>{t.sevenDayForecast || '7-Day Forecast'}</h3>
         <div style={styles.forecastGrid}>
-          {(forecast || []).map((day, index) => (
-            <div key={index} style={styles.forecastCard}>
-              <div style={styles.forecastHeader}>
-                <div>{day.day}</div>
-                <div style={styles.forecastDate}>{day.date}</div>
+          {forecast && forecast.length > 0 ? (
+            forecast.map((day, index) => (
+              <div key={index} style={styles.forecastCard}>
+                <div style={styles.forecastHeader}>
+                  <div>{day.day}</div>
+                  <div style={styles.forecastDate}>{day.date}</div>
+                </div>
+                <div style={styles.forecastWeather}>
+                  <div style={styles.forecastTemp}>
+                    <span style={styles.tempMax}>{day.temp?.max}°</span>
+                    <span style={styles.tempMin}>{day.temp?.min}°</span>
+                  </div>
+                  <div style={styles.forecastCondition}>
+                    {day.condition}</div>
+                  <div style={styles.precipitation}>
+                    💧 {day.precipitation}% {t.precip || 'precip'}
+                  </div>
+                </div>
               </div>
-              <div style={styles.forecastWeather}>
-                <div style={styles.forecastTemp}>
-                  <span style={styles.tempMax}>{day.temp?.max || 32}°</span>
-                  <span style={styles.tempMin}>{day.temp?.min || 22}°</span>
-                </div>
-                <div style={styles.forecastCondition}>
-                  {day.condition || 'Sunny'}
-                </div>
-                <div style={styles.precipitation}>
-                  💧 {(day.precipitation || 0)}% {t.precip || 'precip'}
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div style={styles.noDataMessage}>{forecast.length === 0 && !loading ? 'No forecast data available' : 'Loading forecast data...'}</div>
+          )}
         </div>
       </div>
 
@@ -136,19 +130,25 @@ const WeatherAlerts = () => {
       <div style={styles.insightsSection}>
         <h3>{t.sevenDayPlanningInsights || '7-Day Planning Insights'}</h3>
         <div style={styles.insightsList}>
-          {(insights || []).map((insight, index) => (
-            <div 
-              key={index} 
-              style={{
-                ...styles.insightItem,
-                ...(insight.type === 'warning' ? styles.warningInsight : {}),
-                ...(insight.type === 'danger' ? styles.dangerInsight : {}),
-                ...(insight.type === 'info' ? styles.infoInsight : {})
-              }}
-            >
-              <strong>{insight.day || 'Today'}:</strong> {insight.message || 'No specific insights available'}
-            </div>
-          ))}
+          {insights && insights.length > 0 ? (
+            insights.map((insight, index) => (
+              <div 
+                key={index} 
+                style={
+                  {
+                    ...styles.insightItem,
+                    ...(insight.type === 'warning' ? styles.warningInsight : {}),
+                    ...(insight.type === 'danger' ? styles.dangerInsight : {}),
+                    ...(insight.type === 'info' ? styles.infoInsight : {})
+                  }
+                }
+              >
+                <strong>{insight.day}:</strong> {insight.message}
+              </div>
+            ))
+          ) : (
+            <div style={styles.noDataMessage}>{insights.length === 0 && !loading ? 'No planning insights available' : 'Loading planning insights...'}</div>
+          )}
         </div>
       </div>
     </div>
@@ -271,6 +271,18 @@ const styles = {
   infoInsight: {
     backgroundColor: '#d6eaf8',
     borderLeft: '4px solid #3498db',
+  },
+  noDataMessage: {
+    padding: '20px',
+    textAlign: 'center',
+    color: '#7f8c8d',
+    fontStyle: 'italic',
+  },
+  errorMessage: {
+    padding: '20px',
+    textAlign: 'center',
+    color: '#e74c3c',
+    fontWeight: 'bold',
   },
 };
 
