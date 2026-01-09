@@ -2,8 +2,13 @@ const axios = require('axios');
 
 // Test the weather API directly without authentication
 async function testWeatherAPI() {
-  const apiKey = 'fb3b6d29fa5ca495b1e1da40ad91b4c2'; // Using the API key you provided
+  const apiKey = process.env.OPENWEATHER_API_KEY; // Use environment variable for API key
   const location = 'Mumbai'; // Using a major city for better results
+  
+  if (!apiKey) {
+    console.error('OPENWEATHER_API_KEY environment variable not set!');
+    return;
+  }
 
   try {
     console.log('Testing current weather API...');
