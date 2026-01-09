@@ -2,7 +2,7 @@ const axios = require('axios');
 require('dotenv').config();
 const apiKey = process.env.OPENWEATHER_API_KEY;
 console.log('API Key loaded:', apiKey && apiKey.length > 0 ? 'YES' : 'NO');
-console.log('API Key value:', apiKey);
+// Removed printing of actual API key for security reasons
 
 // Test with one of the locations from the frontend
 const location = 'Maharashtra';
