@@ -23,7 +23,7 @@ This guide will help you set up the backend for the AI-Powered Crop Disease Dete
 3. **Environment Configuration**
    Update your `.env` file with your configuration:
    ```env
-   MONGO_URI=mongodb://localhost:27017/rootcause
+   MONGO_URI=mongodb+srv://soumayanchatterjee2_db_user:Hello@cluster0.rfqpn5a.mongodb.net/?appName=Cluster0
    JWT_SECRET=your_jwt_secret_key_here
    PORT=5000
    ADMIN_EMAIL=admin@example.com
@@ -42,7 +42,7 @@ This guide will help you set up the backend for the AI-Powered Crop Disease Dete
 1. **Local MongoDB** (easiest for development):
    - Install MongoDB Community Edition
    - Start the MongoDB service
-   - Use the default connection string: `mongodb://localhost:27017/rootcause`
+   - Use the default connection string: `mongodb+srv://soumayanchatterjee2_db_user:LmLWVV19vtfJn6sO%20%20%20@cluster0.rfqpn5a.mongodb.net/?retryWrites=true&w=majority`
 
 2. **MongoDB Atlas** (cloud option):
    - Create a free account at [MongoDB Atlas](https://www.mongodb.com/atlas)

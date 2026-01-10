@@ -29,7 +29,7 @@ Backend server for the AI-Powered Crop Disease Detection & Yield Prediction Plat
 2. **Environment Configuration:**
    Create a `.env` file in the root of the backend directory with the following variables:
    ```env
-   MONGO_URI=mongodb://localhost:27017/rootcause
+   MONGO_URI=mongodb+srv://soumayanchatterjee2_db_user:Hello@cluster0.rfqpn5a.mongodb.net/?appName=Cluster0
    JWT_SECRET=your_jwt_secret_key_here
    PORT=5000
    ADMIN_EMAIL=admin@example.com

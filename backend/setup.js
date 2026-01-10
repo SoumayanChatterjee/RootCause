@@ -24,7 +24,7 @@ const envPath = path.join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
   console.log('📝 Creating .env file with default configuration...');
   
-  const envContent = `MONGO_URI=mongodb://localhost:27017/rootcause
+  const envContent = `MONGO_URI=mongodb+srv://soumayanchatterjee2_db_user:Hello@cluster0.rfqpn5a.mongodb.net/?appName=Cluster0
 JWT_SECRET=your_jwt_secret_key_here
 PORT=5000
 
